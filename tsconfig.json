@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "module": "CommonJS",
+    "target": "ES2017",
+    "outDir": "dist",
+    "baseUrl": "./",
+  },
+  "files": ["./src/plugin.ts"],
+  "include": [
+    "./types/*"
+  ]
+}

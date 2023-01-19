@@ -1,0 +1,26 @@
+{
+  "name": "MusicFreePluginTemplate",
+  "version": "1.0.0",
+  "description": "MusicFree插件模板",
+  "main": "dist/plugin.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": {
+    "name": "猫头猫",
+    "email": "lhx_xjtu@163.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@react-native-cookies/cookies": "^6.2.1",
+    "axios": "^0.27.2",
+    "big-integer": "^1.6.51",
+    "cheerio": "^1.0.0-rc.12",
+    "crypto-js": "^4.1.1",
+    "dayjs": "^1.11.4",
+    "he": "^1.2.0",
+    "qs": "^6.11.0",
+    "typescript": "^4.9.4"
+  }
+}
