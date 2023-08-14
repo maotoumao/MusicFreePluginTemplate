@@ -153,9 +153,9 @@ declare namespace IPlugin {
   ) => Promise<ISearchResult<T>>;
 
   interface IPluginDefine {
-    /** 来源名 */
+    /** 插件名 */
     platform: string;
-    /** 匹配的版本号 */
+    /** @deprecated 匹配的版本号 */
     appVersion?: string;
     /** 插件版本 */
     version?: string;
@@ -163,8 +163,10 @@ declare namespace IPlugin {
     srcUrl?: string;
     /** 主键，会被存储到mediameta中 */
     primaryKey?: string[];
-    /** 默认搜索类型 */
+    /** @deprecated 默认搜索类型 */
     defaultSearchType?: IMedia.SupportMediaType;
+    /** 有效搜索类型 */
+    supportedSearchType?: IMedia.SupportMediaType[];
     /** 插件缓存控制 */
     cacheControl?: "cache" | "no-cache" | "no-store";
     /** 提示文本 */

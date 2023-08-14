@@ -10,6 +10,7 @@ import qs from 'qs';
 const pluginInstance: IPlugin.IPluginDefine = {
   platform: "插件名称",
   // TODO: 插件基本信息
+  version: ""
 };
 
 
