@@ -1,23 +1,56 @@
-type WithMusicList<T> = T & {
-  musicList?: IMusic.IMusicItem[];
-};
+/**
+ * 预置的类型
+ * WARNING: 不要修改此文件的类型定义！！！
+ */
 
 declare namespace ICommon {
-  export type SupportMediaType = "music" | "album" | "artist";
-  export type SupportMediaItemBase = {
-    music: Partial<IMusic.IMusicItem>;
-    album: Partial<IAlbum.IAlbumItem>;
-    artist: Partial<IArtist.IArtistItem>;
+  type WithMusicList<T> = T & {
+    musicList?: IMusic.IMusicItem[];
   };
-  export type IMediaBase = {
-    id: string;
+
+  type PaginationResponse<T> = {
+    isEnd?: boolean;
+    data?: T[];
+  };
+}
+declare namespace IMedia {
+  export type SupportMediaItem = {
+    music: IMusic.IMusicItem;
+    album: IAlbum.IAlbumItem;
+    artist: IArtist.IArtistItem;
+    sheet: IMusic.IMusicSheetItem;
+    lyric: ILyric.ILyricItem;
+  };
+
+  export type SupportMediaType = keyof SupportMediaItem;
+
+  interface IUnique {
+    /** 唯一id */
+    id: string | number;
+    $?: any;
+    [k: string | number | symbol]: any;
+  }
+
+  /** 基础媒体类型 */
+  interface IMediaBase extends IUnique {
+    /** 媒体来源平台，如本地等 */
     platform: string;
-    [k: string]: any;
-  };
+    [k: string | number | symbol]: any;
+  }
 }
 
 declare namespace IMusic {
   type IQualityKey = "low" | "standard" | "high" | "super";
+
+  interface IMusicSource {
+    /** 播放的http请求头 */
+    headers?: Record<string, string>;
+    /** 兜底播放 */
+    url?: string;
+    /** UA */
+    userAgent?: string;
+  }
+
   type IQuality = Record<
     IQualityKey,
     {
@@ -25,12 +58,29 @@ declare namespace IMusic {
       size?: string | number;
     }
   >;
+
+  /** 歌单集合 */
+  export interface IMusicSheetGroupItem {
+    title?: string;
+    data: Array<IMusicSheetItem>;
+  }
+
+  type IMusicItemPartial = Partial<IMusicItem>;
+}
+
+declare namespace IArtist {
+  type ArtistMediaType = "music" | "album";
 }
 
 declare namespace ILyric {
   interface ILyricSource {
     lrc?: string;
     rawLrc?: string;
+  }
+
+  interface ILyricItem extends IMusic.IMusicItem {
+    /** 没有时间戳的歌词纯文本 */
+    rawLrcTxt?: string;
   }
 }
 
@@ -57,20 +107,6 @@ declare namespace IMusicSheet {
 
 declare namespace IPlugin {
   type ICacheControl = "cache" | "no-cache" | "no-store";
-  interface ISearchResult<T extends ICommon.SupportMediaType> {
-    isEnd?: boolean;
-    data: ICommon.SupportMediaItemBase[T][];
-  }
-  type ISearchFunc = <T extends ICommon.SupportMediaType>(
-    query: string,
-    page: number,
-    type: T
-  ) => Promise<ISearchResult<T>>;
-
-  interface ISearchResult<T extends ICommon.SupportMediaType> {
-    isEnd?: boolean;
-    data: ICommon.SupportMediaItemBase[T][];
-  }
 
   interface IMediaSourceResult {
     headers?: Record<string, string>;
@@ -81,9 +117,43 @@ declare namespace IPlugin {
     /** 音质 */
     quality?: IMusic.IQualityKey;
   }
+  interface ISearchResult<T extends IMedia.SupportMediaType> {
+    isEnd?: boolean;
+    data: IMedia.SupportMediaItem[T][];
+  }
+
+  type ISearchFunc = <T extends IMedia.SupportMediaType>(
+    query: string,
+    page: number,
+    type: T
+  ) => Promise<ISearchResult<T>>;
+
+  interface IAlbumInfoResult {
+    isEnd?: boolean;
+    albumItem?: IAlbum.IAlbumItem;
+    musicList?: IMusic.IMusicItem[];
+  }
+
+  interface ISheetInfoResult {
+    isEnd?: boolean;
+    sheetItem?: IMusic.IMusicSheetItem;
+    musicList?: IMusic.IMusicItem[];
+  }
+
+  interface IGetRecommendSheetTagsResult {
+    // 固定的tag
+    pinned?: IMusic.IMusicSheetItem[];
+    data?: IMusic.IMusicSheetGroupItem[];
+  }
+
+  type IGetArtistWorksFunc = <T extends IArtist.ArtistMediaType>(
+    artistItem: IArtist.IArtistItem,
+    page: number,
+    type: T
+  ) => Promise<ISearchResult<T>>;
 
   interface IPluginDefine {
-    /** 插件名 */
+    /** 来源名 */
     platform: string;
     /** 匹配的版本号 */
     appVersion?: string;
@@ -94,43 +164,56 @@ declare namespace IPlugin {
     /** 主键，会被存储到mediameta中 */
     primaryKey?: string[];
     /** 默认搜索类型 */
-    defaultSearchType?: ICommon.SupportMediaType;
+    defaultSearchType?: IMedia.SupportMediaType;
     /** 插件缓存控制 */
-    cacheControl?: ICacheControl;
+    cacheControl?: "cache" | "no-cache" | "no-store";
+    /** 提示文本 */
+    hints?: Record<string, string[]>;
     /** 搜索 */
     search?: ISearchFunc;
     /** 获取根据音乐信息获取url */
     getMediaSource?: (
-      musicItem: IMusic.IMusicItem,
+      musicItem: IMusic.IMusicItemPartial,
       quality: IMusic.IQualityKey
     ) => Promise<IMediaSourceResult | null>;
     /** 根据主键去查询歌曲信息 */
     getMusicInfo?: (
-      musicBase: ICommon.IMediaBase
+      musicBase: IMedia.IMediaBase
     ) => Promise<Partial<IMusic.IMusicItem> | null>;
     /** 获取歌词 */
     getLyric?: (
-      musicItem: IMusic.IMusicItem
+      musicItem: IMusic.IMusicItemPartial
     ) => Promise<ILyric.ILyricSource | null>;
-    /** 获取专辑信息，里面的歌曲不要分页 */
+    /** 获取专辑信息，里面的歌曲分页 */
     getAlbumInfo?: (
-      albumItem: IAlbum.IAlbumItem
-    ) => Promise<WithMusicList<IAlbum.IAlbumItem> | null>;
+      albumItem: IAlbum.IAlbumItem,
+      page: number
+    ) => Promise<IAlbumInfoResult | null>;
+    /** 获取歌单信息，有分页 */
+    getMusicSheetInfo?: (
+      sheetItem: IMusic.IMusicSheetItem,
+      page: number
+    ) => Promise<ISheetInfoResult | null>;
     /** 获取作品，有分页 */
-    getArtistWorks?: <T extends Exclude<ICommon.SupportMediaType, "artist">>(
-      artistItem: IArtist.IArtistItem,
-      page: number,
-      type: T
-    ) => Promise<ISearchResult<T>>;
+    getArtistWorks?: IGetArtistWorksFunc;
     /** 导入歌单 */
+    // todo: 数据结构应该是IMusicSheetItem
     importMusicSheet?: (urlLike: string) => Promise<IMusic.IMusicItem[] | null>;
     /** 导入单曲 */
     importMusicItem?: (urlLike: string) => Promise<IMusic.IMusicItem | null>;
     /** 获取榜单 */
-    getTopLists?: () => Promise<IMusicSheet.IMusicTopListGroupItem[]>;
+    getTopLists?: () => Promise<IMusic.IMusicSheetGroupItem[]>;
+    // todo:分页
     /** 获取榜单详情 */
     getTopListDetail?: (
-      topListItem: IMusicSheet.IMusicSheetItem
-    ) => Promise<WithMusicList<IMusicSheet.IMusicSheetItem>>;
+      topListItem: IMusic.IMusicSheetItem
+    ) => Promise<ICommon.WithMusicList<IMusic.IMusicSheetItem>>;
+    /** 获取热门歌单tag */
+    getRecommendSheetTags?: () => Promise<IGetRecommendSheetTagsResult>;
+    /** 歌单列表 */
+    getRecommendSheetsByTag?: (
+      tag: IMedia.IUnique,
+      page?: number
+    ) => Promise<ICommon.PaginationResponse<IMusic.IMusicSheetItem>>;
   }
 }

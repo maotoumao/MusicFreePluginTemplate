@@ -8,9 +8,14 @@
     "target": "ES2017",
     "outDir": "dist",
     "baseUrl": "./",
+    "esModuleInterop": true,
+    "types": [
+      "./types/mediaType.d.ts",
+      "./types/plugin.d.ts"
+    ]
   },
-  "files": ["./src/plugin.ts"],
   "include": [
-    "./types/*"
+    "./types/*",
+    "./src/*"
   ]
 }

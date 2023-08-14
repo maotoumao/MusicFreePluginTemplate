@@ -1,51 +1,51 @@
 /** 音乐 */
 declare namespace IMusic {
-  interface IMusicItem {
-    /** 插件名 */
-    platform?: string;
-    /** 唯一id */
-    id: string | number;
+  interface IMusicItem extends IMedia.IMediaBase {
     /** 作者 */
     artist: string;
-    /** 标题 */
+    /** 歌曲标题 */
     title: string;
     /** 时长(s) */
-    duration: number;
+    duration?: number;
     /** 专辑名 */
-    album: string;
+    album?: string;
     /** 专辑封面图 */
-    artwork: string;
+    artwork?: string;
     /** 默认音源 */
     url?: string;
+    // todo: 格式化
     /** 歌词URL */
     lrc?: string;
-    /** 歌词 */
+    /** 歌词文本 */
     rawLrc?: string;
-    /** 音质信息 */
-    qualities?: IMusic.IQuality;
-    // TODO: 在这里补充完整类型
+    // 其他
+    [k: string | number | symbol]: any;
+  }
+
+  interface IMusicSheetItem extends IMedia.IMediaBase {
+    /** 封面图 */
+    artwork?: string;
+    /** 标题 */
+    title: string;
+    /** 描述 */
+    description?: string;
+    /** 作品总数 */
+    worksNum?: number;
+    /** 播放次数 */
+    playCount?: number;
+    /** 播放列表 */
+    musicList?: IMusicItem[];
+    /** 歌单创建日期 */
+    createAt?: number;
+    // 歌单作者
+    artist?: string;
     [k: string | number]: any;
   }
 }
 
 /** 专辑 */
 declare namespace IAlbum {
-  interface IAlbumItem {
-    /** 插件名 */
-    platform?: string;
-    /** 唯一id */
-    id: string | number;
-    /** 作者 */
-    artist: string;
-    /** 标题 */
-    title: string;
-    /** 专辑封面图 */
-    artwork: string;
-    /** 日期YYYY-MM-DD */
-    date: string;
-    /** 描述文本 */
-    description?: string;
-    // TODO: 在这里补充完整类型
+  interface IAlbumItem extends IMusic.IMusicSheetItem {
     [k: string | number]: any;
   }
 }
@@ -67,6 +67,10 @@ declare namespace IArtist {
     avatar?: string;
     /** 作品数目 */
     worksNum?: number;
+    /** 作者的音乐列表 */
+    musicList?: IMusic.IMusicItem[];
+    /** 作者的专辑列表 */
+    albumList?: IAlbum.IAlbumItem[];
     // TODO: 在这里补充完整类型
     [k: string | number]: any;
   }
