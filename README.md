@@ -18,37 +18,6 @@ npm install
 
 src/index.ts 中默认导出了插件的实例。你只需要关注如何完善插件的逻辑，也就是把 pluginInstance 中的内容补充完整即可。
 
-#### 类型
-
-类型声明在根目录的 types 文件夹下，已经写了比较完整的类型声明，一般情况下不需要修改；如果你的插件中需要补充字段，请修改 types/mediaType.d.ts 中的类型（**注意：可以新增，但是不要删除**）：
-
-如某个音源的音乐类型都具有一个名为 copyright 的字符串，那么你可以把 types/mediaType.d.ts 中 IMusicItem 的类型修改如下：
-
-```diff
-declare namespace IMusic {
-  interface IMusicItem extends IMedia.IMediaBase {
-    /** 作者 */
-    artist: string;
-    /** 歌曲标题 */
-    title: string;
-    /** 时长(s) */
-    duration?: number;
-    /** 专辑名 */
-    album?: string;
-    /** 专辑封面图 */
-    artwork?: string;
-    /** 默认音源 */
-    url?: string;
-    /** 歌词URL */
-    lrc?: string;
-    /** 歌词文本 */
-    rawLrc?: string;
-+   copyright: string;
-    // 其他
-    [k: string | number | symbol]: any;
-  }
-```
-
 #### 注意事项
 你可以像开发其他前端项目一样去开发插件，最终会用 parcel 打包到一个文件中。但开发仍然有一些注意事项：
 
