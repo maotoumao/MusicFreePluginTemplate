@@ -109,69 +109,103 @@ declare namespace IPlugin {
   type ICacheControl = "cache" | "no-cache" | "no-store";
 
   interface IMediaSourceResult {
+    /** http header */
     headers?: Record<string, string>;
     /** 兜底播放 */
     url?: string;
-    /** UA */
+    /** http UA */
     userAgent?: string;
     /** 音质 */
     quality?: IMusic.IQualityKey;
   }
   interface ISearchResult<T extends IMedia.SupportMediaType> {
+    /** 是否到达页尾 */
     isEnd?: boolean;
+    /** 搜索结果数据 */
     data: IMedia.SupportMediaItem[T][];
   }
 
   type ISearchFunc = <T extends IMedia.SupportMediaType>(
+    /** 搜索的关键字 */
     query: string,
+    /** 页码，从 1 开始 */
     page: number,
+    /** 支持的搜索类型 */
     type: T
   ) => Promise<ISearchResult<T>>;
 
   interface IAlbumInfoResult {
+    /** 是否到达页尾 */
     isEnd?: boolean;
-    albumItem?: IAlbum.IAlbumItem;
+    /** albumItem补充字段（比如补充description之类的） */
+    albumItem?: Partial<IAlbum.IAlbumItem>;
     musicList?: IMusic.IMusicItem[];
   }
 
   interface ISheetInfoResult {
     isEnd?: boolean;
-    sheetItem?: IMusic.IMusicSheetItem;
+    sheetItem?: Partial<IMusic.IMusicSheetItem>;
     musicList?: IMusic.IMusicItem[];
   }
 
   interface IGetRecommendSheetTagsResult {
-    // 固定的tag
+    /** 固定的tag */
     pinned?: IMusic.IMusicSheetItem[];
+    /** 所有tag */
     data?: IMusic.IMusicSheetGroupItem[];
   }
 
   type IGetArtistWorksFunc = <T extends IArtist.ArtistMediaType>(
+    /** 作者 */
     artistItem: IArtist.IArtistItem,
+    /** 页码，从1开始 */
     page: number,
+    /** 音乐或专辑 */
     type: T
   ) => Promise<ISearchResult<T>>;
 
+  
+  /** 插件的定义 */
   interface IPluginDefine {
-    /** 插件名 */
+    /**
+     * 插件名
+     *
+     * 需要保证尽可能唯一
+     */
     platform: string;
     /** @deprecated 匹配的版本号 */
     appVersion?: string;
-    /** 插件版本 */
+    /**
+     *  插件版本
+     *  @example 0.0.0-alpha.0
+     */
     version?: string;
-    /** 远程更新的url */
+    /**
+     * 远程更新的url
+     *
+     * app内点击【更新插件】时，会从此链接获取最新插件
+     */
     srcUrl?: string;
-    /** 主键，会被存储到mediameta中 */
+    /**
+     * 主键
+     *
+     * 所有用来唯一标识一个媒体的键的集合，会被存储到mediameta中
+     * @example ["id"]
+     */
     primaryKey?: string[];
     /** @deprecated 默认搜索类型 */
     defaultSearchType?: IMedia.SupportMediaType;
-    /** 有效搜索类型 */
+    /**
+     * 支持的搜索类型
+     *
+     * 如果为空表示支持所有搜索类型
+     */
     supportedSearchType?: IMedia.SupportMediaType[];
     /** 插件缓存控制 */
     cacheControl?: "cache" | "no-cache" | "no-store";
-    /** 提示文本 */
-    hints?: Record<string, string[]>;
-    /** 搜索 */
+    /** 部分场景下的提示文本 */
+    hints?: Record<"importMusicSheet" | "importMusicItem", string[]>;
+    /** 搜索函数 */
     search?: ISearchFunc;
     /** 获取根据音乐信息获取url */
     getMediaSource?: (
@@ -182,16 +216,24 @@ declare namespace IPlugin {
     getMusicInfo?: (
       musicBase: IMedia.IMediaBase
     ) => Promise<Partial<IMusic.IMusicItem> | null>;
-    /** 获取歌词 */
+    /** 根据音乐信息获取歌词 */
     getLyric?: (
       musicItem: IMusic.IMusicItemPartial
     ) => Promise<ILyric.ILyricSource | null>;
-    /** 获取专辑信息，里面的歌曲分页 */
+    /**
+     * 获取专辑信息，里面的歌曲分页
+     *
+     * page从1开始
+     */
     getAlbumInfo?: (
       albumItem: IAlbum.IAlbumItem,
       page: number
     ) => Promise<IAlbumInfoResult | null>;
-    /** 获取歌单信息，有分页 */
+    /**
+     * 获取歌单信息，有分页
+     *
+     * page从1开始
+     */
     getMusicSheetInfo?: (
       sheetItem: IMusic.IMusicSheetItem,
       page: number
@@ -199,20 +241,22 @@ declare namespace IPlugin {
     /** 获取作品，有分页 */
     getArtistWorks?: IGetArtistWorksFunc;
     /** 导入歌单 */
-    // todo: 数据结构应该是IMusicSheetItem
     importMusicSheet?: (urlLike: string) => Promise<IMusic.IMusicItem[] | null>;
     /** 导入单曲 */
     importMusicItem?: (urlLike: string) => Promise<IMusic.IMusicItem | null>;
     /** 获取榜单 */
     getTopLists?: () => Promise<IMusic.IMusicSheetGroupItem[]>;
-    // todo:分页
     /** 获取榜单详情 */
     getTopListDetail?: (
       topListItem: IMusic.IMusicSheetItem
     ) => Promise<ICommon.WithMusicList<IMusic.IMusicSheetItem>>;
     /** 获取热门歌单tag */
     getRecommendSheetTags?: () => Promise<IGetRecommendSheetTagsResult>;
-    /** 歌单列表 */
+    /** 
+     * 歌单列表
+     *
+     * page从1开始
+     */
     getRecommendSheetsByTag?: (
       tag: IMedia.IUnique,
       page?: number

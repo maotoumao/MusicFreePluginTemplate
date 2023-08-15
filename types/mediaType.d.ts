@@ -13,15 +13,15 @@ declare namespace IMusic {
     artwork?: string;
     /** 默认音源 */
     url?: string;
-    // todo: 格式化
     /** 歌词URL */
     lrc?: string;
-    /** 歌词文本 */
+    /** 歌词文本（lrc格式 带时间戳） */
     rawLrc?: string;
     // 其他
     [k: string | number | symbol]: any;
   }
 
+  /** 歌单 */
   interface IMusicSheetItem extends IMedia.IMediaBase {
     /** 封面图 */
     artwork?: string;
@@ -71,7 +71,6 @@ declare namespace IArtist {
     musicList?: IMusic.IMusicItem[];
     /** 作者的专辑列表 */
     albumList?: IAlbum.IAlbumItem[];
-    // TODO: 在这里补充完整类型
     [k: string | number]: any;
   }
 }

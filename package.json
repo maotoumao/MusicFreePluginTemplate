@@ -14,7 +14,7 @@
     "name": "猫头猫",
     "email": "lhx_xjtu@163.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@react-native-cookies/cookies": "^6.2.1",
     "axios": "^0.27.2",
