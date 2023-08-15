@@ -7,7 +7,7 @@
     "module": "CommonJS",
     "target": "ES2017",
     "outDir": "dist",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "esModuleInterop": true,
     "types": [
       "./types/mediaType.d.ts",
@@ -16,6 +16,6 @@
   },
   "include": [
     "./types/*",
-    "./src/*"
+    "./src/**/*"
   ]
 }
