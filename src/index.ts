@@ -1,10 +1,4 @@
 import axios from "axios";
-import cheerio from "cheerio";
-import cryptojs from "crypto-js";
-import dayjs from "dayjs";
-import bigInt from "big-integer";
-import he from "he";
-import qs from "qs";
 import { formatMusicItem, paidMusicFilter } from "./utils/formatter";
 import search from "./methods/search";
 import getArtistWorks from "./methods/getArtistWorks";
