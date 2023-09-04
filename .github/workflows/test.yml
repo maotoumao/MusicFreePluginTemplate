@@ -1,0 +1,14 @@
+name: 打包
+on: 
+    workflow_dispatch:
+jobs:
+    build-macos: 
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                node-version: 16
+            - run: node -p -e '`VERSION=${require("./package.json").version}`' >> $Env:GITHUB_ENV
+            - run: echo ${{ env.VERSION }}
+            - run: echo ${{ env }}
