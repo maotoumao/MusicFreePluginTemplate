@@ -10,6 +10,6 @@ jobs:
               with:
                 node-version: 16
             - run: PKG_VERSION=`node -p -e 'require("./package.json").version'`
-            - run: echo VERSION=$PKG_VERSION >> $Env:GITHUB_ENV
+            - run: echo VERSION=$PKG_VERSION >> $GITHUB_ENV
             - run: echo ${{ env.VERSION }}
             - run: echo ${{ env }}
